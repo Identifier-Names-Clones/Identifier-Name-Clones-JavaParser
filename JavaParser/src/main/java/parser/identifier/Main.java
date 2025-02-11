@@ -1,4 +1,4 @@
-package clones.identifier;
+package parser.identifier;
 
 import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
