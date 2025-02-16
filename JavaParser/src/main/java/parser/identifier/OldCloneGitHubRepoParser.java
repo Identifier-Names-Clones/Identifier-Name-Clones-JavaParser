@@ -12,7 +12,7 @@ import java.io.IOException;
 import java.util.List;
 import java.util.ArrayList;
 
-public class CloneGitHubRepoParser {
+public class OldCloneGitHubRepoParser {
     public static void main(String[] args) {
         String repoUrl = "https://github.com/Identifier-Names-Clones/Identifier-Name-Clones-Refactoring.git"; // Update this URL
         String localDir = "./src/main/repo_clones/refactoring_miner/"; // Update the path
