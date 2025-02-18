@@ -6,13 +6,39 @@ import com.github.javaparser.ast.CompilationUnit;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
+import java.nio.file.Files;
+
 
 public class GitHubRepoParser {
+    // Delete repo if it's already cloned
+    public static void deleteFolder(File folder) {
+        File[] files = folder.listFiles();
+        if (files != null) {
+            for (File f : files) {
+                if (f.isDirectory()) {
+                    deleteFolder(f);
+                } else {
+                    f.delete();
+                }
+            }
+        }
+        folder.delete();
+    }
+
     public static void main(String[] args) throws FileNotFoundException {
+        Database.initializeDatabase();
+
+        // Edit to take in multiple
         String repoUrl = "https://github.com/Identifier-Names-Clones/Identifier-Name-Clones-JavaParser.git";
         String localDir = "./src/main/repo_clones/javaparser/";
+
+        // delete repo if cloned already, and re-clone
+        if (Files.exists(Path.of(localDir))) {
+            deleteFolder(new File(localDir));
+        }
 
         if (cloneRepository(repoUrl, localDir)) {
             File projectDir = new File(localDir);
@@ -27,7 +53,7 @@ public class GitHubRepoParser {
     // Clones only the latest commit and then filters it to only be the java files
     public static boolean cloneRepository(String repoUrl, String localDir) {
         try {
-            // Step 1: Perform a shallow clone (depth=1 to get only the latest commit)
+            // Perform a shallow clone (depth=1 to get only the latest commit)
             ProcessBuilder cloneBuilder = new ProcessBuilder("git", "clone", "--depth", "1", "--no-checkout", repoUrl, localDir);
             cloneBuilder.inheritIO();
             Process cloneProcess = cloneBuilder.start();
@@ -37,7 +63,7 @@ public class GitHubRepoParser {
                 return false; // Clone failed
             }
 
-            // Step 2: Enable sparse checkout in the cloned repository (disable cone mode)
+            // Sparse checkout in the cloned repository (disable cone mode)
             ProcessBuilder sparseCheckoutBuilder = new ProcessBuilder("git", "-C", localDir, "sparse-checkout", "init", "--no-cone");
             sparseCheckoutBuilder.inheritIO();
             Process sparseCheckoutProcess = sparseCheckoutBuilder.start();
@@ -47,7 +73,7 @@ public class GitHubRepoParser {
                 return false; // Sparse checkout init failed
             }
 
-            // Step 3: Set the sparse checkout filter to only include Java files
+            // Only include Java files
             ProcessBuilder setFilterBuilder = new ProcessBuilder("git", "-C", localDir, "sparse-checkout", "set", "*.java");
             setFilterBuilder.inheritIO();
             Process setFilterProcess = setFilterBuilder.start();
@@ -57,7 +83,7 @@ public class GitHubRepoParser {
                 return false; // Setting filter failed
             }
 
-            // Step 4: Checkout the files that match the filter
+            // Checkout the files that match the filter
             ProcessBuilder checkoutBuilder = new ProcessBuilder("git", "-C", localDir, "checkout");
             checkoutBuilder.inheritIO();
             Process checkoutProcess = checkoutBuilder.start();
@@ -95,7 +121,7 @@ public class GitHubRepoParser {
             if (result.isSuccessful() && result.getResult().isPresent()) {
                 CompilationUnit cu = result.getResult().get();
 
-                ClassVisitor visitor = new ClassVisitor();
+                ClassVisitor visitor = new ClassVisitor(file.getName());
                 cu.accept(visitor, null);
             } else {
                 System.err.println("Failed to parse the Java file.");

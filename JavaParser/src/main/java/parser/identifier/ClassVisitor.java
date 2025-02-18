@@ -6,22 +6,32 @@ import com.github.javaparser.ast.body.VariableDeclarator;
 import com.github.javaparser.ast.visitor.VoidVisitorAdapter;
 
 public class ClassVisitor extends VoidVisitorAdapter<Void> {
+    private String filename;
+
+    public ClassVisitor(String filename) {
+        this.filename = filename;
+    }
 
     @Override
     public void visit(ClassOrInterfaceDeclaration n, Void arg) {
-        System.out.println("Class Name: " + n.getName());
+        String className = n.getNameAsString();
+        Database.insertIdentifier(filename, "CLASS", className, null);
         super.visit(n, arg);
     }
 
     @Override
     public void visit(MethodDeclaration n, Void arg) {
-        System.out.println("Method Name: " + n.getName());
+        String methodName = n.getNameAsString();
+        String returnType = n.getType().asString();
+        Database.insertIdentifier(filename, "METHOD", methodName, returnType);
         super.visit(n, arg);
     }
 
     @Override
     public void visit(VariableDeclarator n, Void arg) {
-        System.out.println("Variable Name: " + n.getName());
+        String variableName = n.getNameAsString();
+        String datatype = n.getType().asString();
+        Database.insertIdentifier(filename, "VARIABLE", variableName, datatype);
         super.visit(n, arg);
     }
 }

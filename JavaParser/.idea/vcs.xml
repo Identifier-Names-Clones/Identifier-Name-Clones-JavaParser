@@ -4,6 +4,5 @@
     <mapping directory="$PROJECT_DIR$/.." vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/main/repo_clones" vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/main/repo_clones/javaparser" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/src/main/repo_clones/refactoring_miner" vcs="Git" />
   </component>
 </project>
