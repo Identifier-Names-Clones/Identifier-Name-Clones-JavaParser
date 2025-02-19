@@ -39,3 +39,6 @@ build/
 
 ## Ignore repo_clones
 src/main/repo_clones
+
+## Ignore database
+*.db
