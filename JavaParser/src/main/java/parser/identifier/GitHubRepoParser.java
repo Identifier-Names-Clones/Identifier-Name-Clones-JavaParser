@@ -42,10 +42,13 @@ public class GitHubRepoParser {
 
         if (cloneRepository(repoUrl, localDir)) {
             File projectDir = new File(localDir);
+
+            // add to projects database!! doesn't need its own classvisitor
+            int projectID = Database.insertProject(localDir);
             List<File> javaFiles = getAllJavaFiles(projectDir);
 
             System.out.println("Extracting class names from " + javaFiles.size() + " files...");
-            parseJavaFiles(javaFiles);
+            parseJavaFiles(javaFiles, projectID);
         }
     }
 
@@ -114,14 +117,14 @@ public class GitHubRepoParser {
     }
 
     // Parse the Java files and extract the class, method names, and identifiers
-    public static void parseJavaFiles(List<File> javaFiles) throws FileNotFoundException {
+    public static void parseJavaFiles(List<File> javaFiles, int projectID) throws FileNotFoundException {
         JavaParser parser = new JavaParser();
         for (File file : javaFiles) {
             ParseResult<CompilationUnit> result = parser.parse(file);
             if (result.isSuccessful() && result.getResult().isPresent()) {
                 CompilationUnit cu = result.getResult().get();
 
-                ClassVisitor visitor = new ClassVisitor(file.getName());
+                ClassVisitor visitor = new ClassVisitor(file.getName(), projectID);
                 cu.accept(visitor, null);
             } else {
                 System.err.println("Failed to parse the Java file.");
