@@ -5,6 +5,7 @@ import com.github.javaparser.ast.CompilationUnit;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.util.Scanner;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
@@ -32,23 +33,36 @@ public class GitHubRepoParser {
         Database.initializeDatabase();
 
         // Edit to take in multiple
-        String repoUrl = "https://github.com/Identifier-Names-Clones/Identifier-Name-Clones-JavaParser.git";
-        String localDir = "./src/main/repo_clones/javaparser/";
+        //String repoUrl = "https://github.com/Identifier-Names-Clones/Identifier-Name-Clones-JavaParser.git";
+        //String localDir = "./src/main/repo_clones/javaparser/";
 
-        // delete repo if cloned already, and re-clone
-        if (Files.exists(Path.of(localDir))) {
-            deleteFolder(new File(localDir));
-        }
+        try {
+            File myObj = new File("./src/main/java/parser/identifier/project_repos.txt");
+            Scanner myReader = new Scanner(myObj);
+            while (myReader.hasNextLine()) {
+                String repoUrl = myReader.nextLine();
+                String directory = "./src/main/repo_clones/" + repoUrl.substring(repoUrl.lastIndexOf("/") + 1);
 
-        if (cloneRepository(repoUrl, localDir)) {
-            File projectDir = new File(localDir);
+                // delete repo if cloned already, and re-clone
+                if (Files.exists(Path.of(directory))) {
+                    deleteFolder(new File(directory));
+                }
 
-            // add to projects database!! doesn't need its own classvisitor
-            int projectID = Database.insertProject(localDir);
-            List<File> javaFiles = getAllJavaFiles(projectDir);
+                if (cloneRepository(repoUrl, directory)) {
+                    File projectDir = new File(directory);
 
-            System.out.println("Extracting class names from " + javaFiles.size() + " files...");
-            parseJavaFiles(javaFiles, projectID);
+                    // add to projects database!! doesn't need its own classvisitor
+                    int projectID = Database.insertProject(directory);
+                    List<File> javaFiles = getAllJavaFiles(projectDir);
+
+                    System.out.println("Extracting class names from " + javaFiles.size() + " files...");
+                    parseJavaFiles(javaFiles, projectID, directory);
+                }
+            }
+            myReader.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("An error occurred.");
+            e.printStackTrace();
         }
     }
 
@@ -117,14 +131,17 @@ public class GitHubRepoParser {
     }
 
     // Parse the Java files and extract the class, method names, and identifiers
-    public static void parseJavaFiles(List<File> javaFiles, int projectID) throws FileNotFoundException {
+    public static void parseJavaFiles(List<File> javaFiles, int projectID, String basePath) throws FileNotFoundException {
         JavaParser parser = new JavaParser();
         for (File file : javaFiles) {
             ParseResult<CompilationUnit> result = parser.parse(file);
+
+            String relativePath = new File(basePath).toURI().relativize(file.toURI()).getPath();
+
             if (result.isSuccessful() && result.getResult().isPresent()) {
                 CompilationUnit cu = result.getResult().get();
 
-                ClassVisitor visitor = new ClassVisitor(file.getName(), projectID);
+                ClassVisitor visitor = new ClassVisitor(relativePath, projectID);
                 cu.accept(visitor, null);
             } else {
                 System.err.println("Failed to parse the Java file.");

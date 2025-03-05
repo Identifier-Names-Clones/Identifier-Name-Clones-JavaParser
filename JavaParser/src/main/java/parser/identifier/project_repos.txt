@@ -1,0 +1,2 @@
+https://github.com/Identifier-Names-Clones/Identifier-Name-Clones-JavaParser
+https://github.com/Identifier-Names-Clones/Identifier-Name-Clones-Refactoring
