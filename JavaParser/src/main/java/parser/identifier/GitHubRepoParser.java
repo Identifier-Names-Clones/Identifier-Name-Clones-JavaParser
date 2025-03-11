@@ -40,8 +40,9 @@ public class GitHubRepoParser {
             File myObj = new File("./src/main/java/parser/identifier/project_repos.txt");
             Scanner myReader = new Scanner(myObj);
             while (myReader.hasNextLine()) {
-                String repoUrl = myReader.nextLine();
-                String directory = "./src/main/repo_clones/" + repoUrl.substring(repoUrl.lastIndexOf("/") + 1);
+                String nextName = myReader.nextLine();
+                String repoUrl = "https://github.com" + nextName;
+                String directory = "./src/main/repo_clones" + nextName;
 
                 // delete repo if cloned already, and re-clone
                 if (Files.exists(Path.of(directory))) {
