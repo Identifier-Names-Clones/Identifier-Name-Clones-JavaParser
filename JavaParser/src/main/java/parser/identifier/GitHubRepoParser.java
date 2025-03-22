@@ -3,10 +3,8 @@ import com.github.javaparser.JavaParser;
 import com.github.javaparser.ParseResult;
 import com.github.javaparser.ast.CompilationUnit;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.io.*;
 import java.util.Scanner;
-import java.io.IOException;
 import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +12,8 @@ import java.nio.file.Files;
 
 
 public class GitHubRepoParser {
+    private static final String LOG_FILE_PATH = "./error_log.log";
+
     // Delete repo if it's already cloned
     public static void deleteFolder(File folder) {
         File[] files = folder.listFiles();
@@ -135,18 +135,33 @@ public class GitHubRepoParser {
     public static void parseJavaFiles(List<File> javaFiles, int projectID, String basePath) throws FileNotFoundException {
         JavaParser parser = new JavaParser();
         for (File file : javaFiles) {
-            ParseResult<CompilationUnit> result = parser.parse(file);
+            try {
+                ParseResult<CompilationUnit> result = parser.parse(file);
 
-            String relativePath = new File(basePath).toURI().relativize(file.toURI()).getPath();
+                String relativePath = new File(basePath).toURI().relativize(file.toURI()).getPath();
 
-            if (result.isSuccessful() && result.getResult().isPresent()) {
                 CompilationUnit cu = result.getResult().get();
 
                 ClassVisitor visitor = new ClassVisitor(relativePath, projectID);
                 cu.accept(visitor, null);
-            } else {
-                System.err.println("Failed to parse the Java file.");
             }
+            catch (Exception e) {
+                logExceptionToFile(e, file.getName());
+
+            }
+
+        }
+    }
+
+    private static void logExceptionToFile(Exception e, String fileName) {
+        System.out.println("Exception occurred: " + e.getMessage());
+        try (FileWriter fw = new FileWriter(LOG_FILE_PATH, true);
+             PrintWriter pw = new PrintWriter(fw)) {
+            pw.println("Exception occurred while processing file: " + fileName);
+            e.printStackTrace(pw); // Write the stack trace to the file
+            pw.println(); // Add a blank line for separation
+        } catch (IOException ioException) {
+            ioException.printStackTrace(); // Handle the case where logging fails
         }
     }
 }

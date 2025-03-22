@@ -3,8 +3,8 @@
   <component name="VcsDirectoryMappings">
     <mapping directory="$PROJECT_DIR$/.." vcs="Git" />
     <mapping directory="$PROJECT_DIR$/src/main/repo_clones" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/src/main/repo_clones/Identifier-Name-Clones-JavaParser" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/src/main/repo_clones/Identifier-Name-Clones-Refactoring" vcs="Git" />
-    <mapping directory="$PROJECT_DIR$/src/main/repo_clones/javaparser" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/main/repo_clones/Identifier-Names-Clones/Identifier-Name-Clones-JavaParser" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/main/repo_clones/reactivex/rxandroid" vcs="Git" />
+    <mapping directory="$PROJECT_DIR$/src/main/repo_clones/spring-projects/spring-boot" vcs="Git" />
   </component>
 </project>

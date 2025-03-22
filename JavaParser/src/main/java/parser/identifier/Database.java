@@ -37,6 +37,9 @@ public class Database {
                 "type TEXT NOT NULL, " +
                 "name TEXT NOT NULL, " +
                 "datatype TEXT," +
+                "className TEXT," +
+                "methodName TEXT," +
+                "lineNumber INTEGER," +
                 "FOREIGN KEY (projectID) REFERENCES projects(id))";
 
         String projects_sql = "CREATE TABLE IF NOT EXISTS projects (" +
@@ -58,8 +61,8 @@ public class Database {
         }
     }
 
-    public static void insertIdentifier(int projectID, String filename, String type, String name, String datatype) {
-        String sql = "INSERT INTO identifiers (projectID, filename, type, name, datatype) VALUES (?, ?, ?, ?, ?)";
+    public static void insertIdentifier(int projectID, String filename, String type, String name, String datatype, String className, String methodName, int lineNumber) {
+        String sql = "INSERT INTO identifiers (projectID, filename, type, name, datatype, className, methodName, lineNumber) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
 
         try (Connection conn = getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -68,6 +71,9 @@ public class Database {
             stmt.setString(3, type);
             stmt.setString(4, name);
             stmt.setString(5, datatype);
+            stmt.setString(6, className);
+            stmt.setString(7, methodName);
+            stmt.setInt(8, lineNumber);
             stmt.executeUpdate();
         } catch (SQLException e) {
             e.printStackTrace();
