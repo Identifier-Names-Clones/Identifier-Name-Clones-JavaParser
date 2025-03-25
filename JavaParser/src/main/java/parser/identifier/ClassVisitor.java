@@ -52,17 +52,17 @@ public class ClassVisitor extends VoidVisitorAdapter<Void> {
         // relative filepath column
     }
 
-    @Override
-    public void visit(FieldDeclaration n, Void arg) {
-        n.getVariables().forEach(var -> {
-            String variableName = var.getNameAsString();
-            String datatype = var.getType().asString();
-            int lineNumber = n.getBegin().isPresent() ? n.getBegin().get().line : -1;
-            Database.insertIdentifier(projectID, fileName, "VARIABLE", variableName, datatype, currentClassName, currentMethodName, lineNumber);
-        });
-
-        super.visit(n, arg);
-    }
+//    @Override
+//    public void visit(FieldDeclaration n, Void arg) {
+//        n.getVariables().forEach(var -> {
+//            String variableName = var.getNameAsString();
+//            String datatype = var.getType().asString();
+//            int lineNumber = n.getBegin().isPresent() ? n.getBegin().get().line : -1;
+//            Database.insertIdentifier(projectID, fileName, "FIELD", variableName, datatype, currentClassName, currentMethodName, lineNumber);
+//        });
+//
+//        super.visit(n, arg);
+//    }
 
     @Override
     public void visit(Parameter n, Void arg) {
